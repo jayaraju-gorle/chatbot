@@ -39,7 +39,7 @@ async function sendMessage() {
         const data = await response.json();
         console.log("Parsed JSON Data:", data); // Log the ENTIRE parsed JSON
 
-        const botResponse = data.text;  // <--- THIS LINE MIGHT BE WRONG
+        const botResponse = data.result;
         console.log("botResponse:", botResponse); // Log what you *think* is the response
 
         addMessage(botResponse, 'bot');
