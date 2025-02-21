@@ -1,0 +1,82 @@
+body {
+    font-family: sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f0f0f0;
+    margin: 0; /* Remove default body margin */
+}
+
+.chat-container {
+    width: 400px; /* Or whatever width you prefer */
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+    overflow: hidden; /* Ensure content doesn't overflow */
+    display: flex;
+    flex-direction: column;
+    height: 500px; /* Set a fixed height for the container */
+
+}
+
+.chat-header {
+    background-color: #007bff;
+    color: white;
+    padding: 10px;
+    text-align: center;
+}
+
+.chat-messages {
+    padding: 10px;
+    overflow-y: auto; /* Enable scrolling for messages */
+    flex-grow: 1; /* Allow messages to take up remaining space */
+
+}
+
+.chat-input {
+    display: flex;
+    padding: 10px;
+    border-top: 1px solid #ccc;
+}
+
+.chat-input input {
+    flex-grow: 1;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-right: 10px;
+}
+
+.chat-input button {
+    padding: 8px 15px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.user-message {
+    text-align: right;
+    margin-bottom: 10px;
+    color: blue;
+}
+
+.bot-message {
+    text-align: left;
+    margin-bottom: 10px;
+    color: green;
+}
+.message-bubble {
+    background-color: #e0e0e0; /* Light gray */
+    padding: 8px 12px;
+    border-radius: 15px;
+    display: inline-block; /* Important for proper alignment */
+    max-width: 70%; /* Prevent bubbles from being too wide */
+}
+.user-message .message-bubble {
+    background-color: #dcf8c6; /* Light green (WhatsApp style) */
+    margin-left: auto; /* Push user bubbles to the right */
+}
