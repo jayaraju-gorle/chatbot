@@ -9,7 +9,7 @@ function addMessage(message, sender) {
     messageDiv.classList.add(sender === 'user' ? 'user-message' : 'bot-message');
     const bubble = document.createElement('div');
     bubble.classList.add('message-bubble');
-    bubble.textContent = message;
+    bubble.textContent = message; // Ensure this is setting the text content
     messageDiv.appendChild(bubble);
     chatMessages.appendChild(messageDiv);
     chatMessages.scrollTop = chatMessages.scrollHeight; // Scroll to the bottom
@@ -18,10 +18,10 @@ function addMessage(message, sender) {
 // Function to send the user's message to the API and handle the response
 async function sendMessage() {
     const userMessage = userInput.value.trim();
-    if (userMessage === '') return; // Don't send empty messages
+    if (userMessage === '') return;
 
-    addMessage(userMessage, 'user'); // Display user message
-    userInput.value = ''; // Clear the input field
+    addMessage(userMessage, 'user');
+    userInput.value = '';
 
     try {
         const response = await fetch(apiUrl, {
@@ -37,8 +37,12 @@ async function sendMessage() {
         }
 
         const data = await response.json();
-        const botResponse = data.text;  //CHANGED: extract text from data
-        addMessage(botResponse, 'bot'); // Display bot response
+        console.log("Parsed JSON Data:", data); // Log the ENTIRE parsed JSON
+
+        const botResponse = data.text;  // <--- THIS LINE MIGHT BE WRONG
+        console.log("botResponse:", botResponse); // Log what you *think* is the response
+
+        addMessage(botResponse, 'bot');
 
     } catch (error) {
         console.error('Error:', error);
