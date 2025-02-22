@@ -1,50 +1,145 @@
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    background-color: #f0f0f0;
     margin: 0;
+    padding: 0;
+    background-color: #f0f0f0;
+    min-height: 100vh;
 }
 
 .chat-wrapper {
     display: flex;
-    gap: 20px;
-    width: 100%;
-    max-width: 1200px;
-    padding: 20px;
+    gap: 16px;
+    padding: 16px;
+    max-width: 1400px;
+    margin: 0 auto;
     box-sizing: border-box;
+    height: 100vh;
 }
 
 .chat-container {
     flex: 1;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    background-color: #fff;
-    overflow: hidden;
     display: flex;
     flex-direction: column;
-    height: 90vh;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    height: calc(100vh - 32px);
+    max-height: 800px;
+    overflow: hidden;
 }
 
-/* Existing styles remain the same */
+.chat-header {
+    padding: 16px;
+    background: #007bff;
+    color: white;
+    text-align: left;
+}
 
-/* Loading indicator styles */
+.chat-header h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    background: #f8f9fa;
+}
+
+.message-bubble {
+    padding: 8px 12px;
+    border-radius: 16px;
+    max-width: 80%;
+    margin-bottom: 4px;
+    word-wrap: break-word;
+}
+
+.user-message {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    margin-bottom: 12px;
+}
+
+.user-message .message-bubble {
+    background: #007bff;
+    color: white;
+}
+
+.bot-message {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 12px;
+}
+
+.bot-message .message-bubble {
+    background: #e9ecef;
+    color: #212529;
+}
+
+.timestamp {
+    font-size: 11px;
+    color: #666;
+    margin-top: 4px;
+    margin-bottom: 8px;
+}
+
+.chat-input {
+    display: flex;
+    padding: 12px;
+    background: white;
+    border-top: 1px solid #eee;
+    gap: 8px;
+}
+
+.chat-input input {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    font-size: 14px;
+    outline: none;
+}
+
+.chat-input input:focus {
+    border-color: #007bff;
+}
+
+.chat-input button {
+    padding: 8px 16px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.chat-input button:hover {
+    background: #0056b3;
+}
+
+.chat-input button:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
 .loading-indicator {
     display: flex;
-    align-items: center;
     gap: 4px;
-    padding: 10px;
-    margin: 10px 0;
+    padding: 8px;
+    justify-content: center;
 }
 
 .loading-dot {
-    width: 8px;
-    height: 8px;
-    background-color: #007bff;
+    width: 6px;
+    height: 6px;
+    background: #007bff;
     border-radius: 50%;
-    animation: bounce 1.4s infinite ease-in-out;
+    animation: bounce 1.4s infinite ease-in-out both;
 }
 
 .loading-dot:nth-child(1) { animation-delay: -0.32s; }
@@ -55,52 +150,45 @@ body {
     40% { transform: scale(1.0); }
 }
 
-/* Timestamp styles */
-.timestamp {
-    font-size: 12px;
-    color: #666;
-    margin: 4px 8px;
-    text-align: center;
-}
-
-/* Input disabled state */
-.chat-input input:disabled {
-    background-color: #f5f5f5;
-    cursor: not-allowed;
-}
-
-.chat-input button:disabled {
-    background-color: #cccccc;
-    cursor: not-allowed;
-}
-
-/* Mobile styles */
+/* Mobile Styles */
 @media (max-width: 768px) {
     .chat-wrapper {
         padding: 0;
+        height: 100vh;
     }
 
     .chat-container {
-        height: 100vh;
+        height: calc(100vh - 50px); /* Account for mobile toggle button */
         border-radius: 0;
+        max-height: none;
     }
 
     #apolloChat {
         display: none;
     }
 
-    .mobile-only {
-        display: block;
+    .toggle-button {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 12px;
+        background: #007bff;
+        color: white;
+        border: none;
+        font-weight: 500;
+        cursor: pointer;
+        z-index: 100;
     }
 
-    .chat-wrapper {
-        flex-direction: column;
+    .toggle-button:hover {
+        background: #0056b3;
     }
 }
 
-/* Desktop styles */
+/* Hide toggle button on desktop */
 @media (min-width: 769px) {
-    .mobile-only {
+    .toggle-button {
         display: none;
     }
 }
