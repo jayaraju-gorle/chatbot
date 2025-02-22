@@ -7,18 +7,37 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="chat-container">
-        <div class="chat-header">
-            <h2>AI Assistant</h2>
-            <button id="chatToggle" class="toggle-button">Switch to Apollo Support</button>
+    <div class="chat-wrapper">
+        <!-- Generic Chatbot -->
+        <div class="chat-container" id="genericChat">
+            <div class="chat-header">
+                <h2>AI Assistant</h2>
+            </div>
+            <div class="chat-messages" id="genericMessages">
+                <!-- Messages will be added here dynamically -->
+            </div>
+            <div class="chat-input">
+                <input type="text" id="genericInput" placeholder="Type your message...">
+                <button id="genericSendButton">Send</button>
+            </div>
         </div>
-        <div class="chat-messages" id="chatMessages">
-            <!-- Messages will be added here dynamically -->
+
+        <!-- Apollo Support Chatbot - Hidden on mobile by default -->
+        <div class="chat-container" id="apolloChat">
+            <div class="chat-header">
+                <h2>Apollo247 Support</h2>
+            </div>
+            <div class="chat-messages" id="apolloMessages">
+                <!-- Messages will be added here dynamically -->
+            </div>
+            <div class="chat-input">
+                <input type="text" id="apolloInput" placeholder="Type your message...">
+                <button id="apolloSendButton">Send</button>
+            </div>
         </div>
-        <div class="chat-input">
-            <input type="text" id="userInput" placeholder="Type your message...">
-            <button id="sendButton">Send</button>
-        </div>
+
+        <!-- Mobile Toggle Button -->
+        <button id="chatToggle" class="toggle-button mobile-only">Switch Chatbot</button>
     </div>
     <script src="script.js"></script>
 </body>

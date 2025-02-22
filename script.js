@@ -1,79 +1,129 @@
-const userInput = document.getElementById('userInput');
-const sendButton = document.getElementById('sendButton');
-const chatMessages = document.getElementById('chatMessages');
-const chatToggle = document.getElementById('chatToggle');
 const apiBaseUrl = 'https://ai-tools-backend-772545827002.asia-south1.run.app';
 
-let currentChatbot = 'generic'; // 'generic' or 'apollo'
+class ChatManager {
+    constructor(type) {
+        this.type = type;
+        this.container = document.getElementById(`${type}Chat`);
+        this.messages = document.getElementById(`${type}Messages`);
+        this.input = document.getElementById(`${type}Input`);
+        this.sendButton = document.getElementById(`${type}SendButton`);
+        this.isProcessing = false;
 
-// Function to add a message to the chat display
-function addMessage(message, sender) {
-    const messageDiv = document.createElement('div');
-    messageDiv.classList.add(sender === 'user' ? 'user-message' : 'bot-message');
-    const bubble = document.createElement('div');
-    bubble.classList.add('message-bubble');
-    bubble.textContent = message;
-    messageDiv.appendChild(bubble);
-    chatMessages.appendChild(messageDiv);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-}
+        this.setupEventListeners();
+        this.addInitialMessage();
+    }
 
-// Function to toggle between chatbots
-function toggleChatbot() {
-    currentChatbot = currentChatbot === 'generic' ? 'apollo' : 'generic';
-    chatToggle.textContent = `Switch to ${currentChatbot === 'generic' ? 'Apollo Support' : 'Generic Chat'}`;
-    
-    // Clear chat history when switching
-    chatMessages.innerHTML = '';
-    
-    // Add initial message based on chatbot type
-    const initialMessage = currentChatbot === 'generic' 
-        ? "Hi! How can I help you?"
-        : "Welcome to Apollo247 Support! Please provide your order number for assistance.";
-    addMessage(initialMessage, 'bot');
-}
-
-// Function to send the user's message to the API and handle the response
-async function sendMessage() {
-    const userMessage = userInput.value.trim();
-    if (userMessage === '') return;
-
-    addMessage(userMessage, 'user');
-    userInput.value = '';
-
-    const endpoint = currentChatbot === 'generic' ? '/text' : '/support';
-
-    try {
-        const response = await fetch(`${apiBaseUrl}${endpoint}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ text: userMessage })
+    setupEventListeners() {
+        this.sendButton.addEventListener('click', () => this.sendMessage());
+        this.input.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                this.sendMessage();
+            }
         });
+    }
 
-        if (!response.ok) {
-            throw new Error(`API request failed with status: ${response.status}`);
+    addInitialMessage() {
+        const initialMessage = this.type === 'generic' 
+            ? "Hi! How can I help you?"
+            : "Welcome to Apollo247 Support! Please provide your order number for assistance.";
+        this.addMessage(initialMessage, 'bot');
+    }
+
+    createLoadingIndicator() {
+        const loadingDiv = document.createElement('div');
+        loadingDiv.className = 'loading-indicator';
+        for (let i = 0; i < 3; i++) {
+            const dot = document.createElement('div');
+            dot.className = 'loading-dot';
+            loadingDiv.appendChild(dot);
+        }
+        return loadingDiv;
+    }
+
+    formatTimestamp(date) {
+        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+
+    addMessage(message, sender, timestamp = new Date()) {
+        const messageDiv = document.createElement('div');
+        messageDiv.classList.add(sender === 'user' ? 'user-message' : 'bot-message');
+
+        const timestampDiv = document.createElement('div');
+        timestampDiv.classList.add('timestamp');
+        timestampDiv.textContent = this.formatTimestamp(timestamp);
+
+        const bubble = document.createElement('div');
+        bubble.classList.add('message-bubble');
+        bubble.textContent = message;
+
+        messageDiv.appendChild(bubble);
+        messageDiv.appendChild(timestampDiv);
+        this.messages.appendChild(messageDiv);
+        this.messages.scrollTop = this.messages.scrollHeight;
+    }
+
+    setProcessingState(isProcessing) {
+        this.isProcessing = isProcessing;
+        this.input.disabled = isProcessing;
+        this.sendButton.disabled = isProcessing;
+    }
+
+    async sendMessage() {
+        const userMessage = this.input.value.trim();
+        if (userMessage === '' || this.isProcessing) return;
+
+        this.setProcessingState(true);
+        this.addMessage(userMessage, 'user');
+        this.input.value = '';
+
+        const loadingIndicator = this.createLoadingIndicator();
+        this.messages.appendChild(loadingIndicator);
+
+        const endpoint = this.type === 'generic' ? '/text' : '/support';
+
+        try {
+            const response = await fetch(`${apiBaseUrl}${endpoint}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ text: userMessage })
+            });
+
+            if (!response.ok) {
+                throw new Error(`API request failed with status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            this.messages.removeChild(loadingIndicator);
+            this.addMessage(data.result, 'bot');
+
+        } catch (error) {
+            console.error('Error:', error);
+            this.messages.removeChild(loadingIndicator);
+            this.addMessage('Error: Could not get a response from the chatbot.', 'bot');
         }
 
-        const data = await response.json();
-        const botResponse = data.result;
-        addMessage(botResponse, 'bot');
-
-    } catch (error) {
-        console.error('Error:', error);
-        addMessage('Error: Could not get a response from the chatbot.', 'bot');
+        this.setProcessingState(false);
     }
 }
 
-// Event listeners
-sendButton.addEventListener('click', sendMessage);
-chatToggle.addEventListener('click', toggleChatbot);
-userInput.addEventListener('keypress', (event) => {
-    if (event.key === 'Enter') {
-        sendMessage();
+// Mobile toggle functionality
+const chatToggle = document.getElementById('chatToggle');
+const genericChat = document.getElementById('genericChat');
+const apolloChat = document.getElementById('apolloChat');
+
+let currentMobileChat = 'generic';
+
+chatToggle.addEventListener('click', () => {
+    if (window.innerWidth <= 768) {
+        currentMobileChat = currentMobileChat === 'generic' ? 'apollo' : 'generic';
+        genericChat.style.display = currentMobileChat === 'generic' ? 'flex' : 'none';
+        apolloChat.style.display = currentMobileChat === 'apollo' ? 'flex' : 'none';
+        chatToggle.textContent = `Switch to ${currentMobileChat === 'generic' ? 'Apollo Support' : 'Generic Chat'}`;
     }
 });
 
-// Initial message
-addMessage("Hi! How can I help you?", "bot");
+// Initialize both chat managers
+const genericChatManager = new ChatManager('generic');
+const apolloChatManager = new ChatManager('apollo');
