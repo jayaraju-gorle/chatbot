@@ -25,7 +25,7 @@ class ChatManager {
     addInitialMessage() {
         const initialMessage = this.type === 'generic' 
             ? "Hi! How can I help you?"
-            : "Welcome to Apollo247 Support! Please provide your order number for assistance.";
+            : "Welcome to Apollo247 Support! How can I help you today? You can ask about your health credits, recent transactions, or membership status.";
         this.addMessage(initialMessage, 'bot');
     }
 
@@ -54,7 +54,18 @@ class ChatManager {
 
         const bubble = document.createElement('div');
         bubble.classList.add('message-bubble');
-        bubble.textContent = message;
+        
+        // Handle multi-line messages by preserving line breaks
+        if (typeof message === 'string') {
+            const formattedMessage = message.split('\n').map(line => {
+                const p = document.createElement('p');
+                p.textContent = line;
+                return p;
+            });
+            formattedMessage.forEach(p => bubble.appendChild(p));
+        } else {
+            bubble.textContent = message;
+        }
 
         messageDiv.appendChild(bubble);
         messageDiv.appendChild(timestampDiv);
@@ -66,6 +77,16 @@ class ChatManager {
         this.isProcessing = isProcessing;
         this.input.disabled = isProcessing;
         this.sendButton.disabled = isProcessing;
+    }
+
+    formatErrorMessage(error) {
+        if (typeof error === 'string') {
+            return error;
+        }
+        if (error.error) {
+            return error.error;
+        }
+        return 'An unexpected error occurred. Please try again.';
     }
 
     async sendMessage() {
@@ -90,18 +111,28 @@ class ChatManager {
                 body: JSON.stringify({ text: userMessage })
             });
 
+            const data = await response.json();
+
             if (!response.ok) {
-                throw new Error(`API request failed with status: ${response.status}`);
+                throw new Error(this.formatErrorMessage(data));
             }
 
-            const data = await response.json();
             this.messages.removeChild(loadingIndicator);
-            this.addMessage(data.result, 'bot');
+            
+            // Handle the new response format for support endpoint
+            if (this.type === 'apollo') {
+                // Use the 'response' field for natural language responses
+                const botResponse = data.response || data.error || 'No response received';
+                this.addMessage(botResponse, 'bot');
+            } else {
+                // Handle generic chat responses
+                this.addMessage(data.result, 'bot');
+            }
 
         } catch (error) {
             console.error('Error:', error);
             this.messages.removeChild(loadingIndicator);
-            this.addMessage('Error: Could not get a response from the chatbot.', 'bot');
+            this.addMessage(this.formatErrorMessage(error), 'bot');
         }
 
         this.setProcessingState(false);
